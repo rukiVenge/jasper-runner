@@ -45,29 +45,36 @@ public class JasperRunner {
                 formatter.printHelp("jasper-runner", options);
             } else {
 
+                System.out.println("Building report "+cmd.getOptionValue("report"));
                 try {
                     Class.forName(cmd.getOptionValue("driver"));
-                    Connection connection = DriverManager.getConnection(cmd.getOptionValue("jdbcUrl"), cmd.getOptionValue("username"), cmd.getOptionValue("password"));
+                    Connection connection = DriverManager.getConnection(cmd.getOptionValue("jdbcurl"), cmd.getOptionValue("username"), cmd.getOptionValue("password"));
+                    System.out.println("Connected to "+cmd.getOptionValue("jdbcUrl"));
                     JasperReport jasperReport = JasperCompileManager.compileReport(cmd.getOptionValue("report"));
                     JRPdfExporter pdfExporter = new JRPdfExporter();
                     JasperPrint print = JasperFillManager.fillReport(jasperReport, cmd.getOptionProperties("D"), connection);
 
                     pdfExporter.setParameter(JRExporterParameter.JASPER_PRINT, print);
                     pdfExporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, cmd.getOptionValue("output"));
+                    System.out.println("Exporting report to "+cmd.getOptionValue("output"));
                     pdfExporter.exportReport();
                 } catch (JRException e) {
                     System.err.print("Unable to parse report file (" + cmd.getOptionValue("r") + ")");
                     e.printStackTrace();
+                    System.exit(1);
                 } catch (ClassNotFoundException e) {
                     System.err.print("Unable to find the database driver,  is it on the classpath?");
                     e.printStackTrace();
+                    System.exit(1);
                 } catch (SQLException e) {
                     System.err.print("An SQL exception has occurred (" + e.getMessage() + ")");
                     e.printStackTrace();
+                    System.exit(1);
                 }
             }
         } catch (ParseException e) {
             System.err.print("Unable to parse command line options (" + e.getMessage() + ")");
+            System.exit(1);
         }
     }
 }
