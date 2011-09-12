@@ -35,12 +35,6 @@
             <artifactId>jasperreports-fonts</artifactId>
             <version>4.0.0</version>
         </dependency>
-        <dependency>
-            <groupId>net.sf.jasperreports</groupId>
-            <artifactId>jasperreports-chart-themes</artifactId>
-            <version>4.0.2</version>
-            <systemPath>${project.basedir}/lib/jasperreports-chart-themes-4.0.2.jar</systemPath>
-        </dependency>
     </dependencies>
 
     <build>
