@@ -54,7 +54,7 @@ public class JasperRunner {
         options.addOption(driver);
 
         options.addOption("jdbcurl", true, "database jdbc url (i.e. jdbc:mysql://localhost:3306/database)");
-        options.addOption("excel",true,"Will override the PDF default and export to Microsoft Excel");
+        options.addOption("excel", true, "Will override the PDF default and export to Microsoft Excel");
         options.addOption("username", true, "database username");
         options.addOption("password", true, "database password");
         options.addOption("output", true, "the output filename (i.e. path/to/report.pdf");
@@ -88,14 +88,33 @@ public class JasperRunner {
                     JRPdfExporter pdfExporter = new JRPdfExporter();
 
                     Properties properties = cmd.getOptionProperties("D");
-                    Map<String,String> parameters = new HashMap<String,String>();
+                    Map<String, Object> parameters = new HashMap<String, Object>();
 
-                    for(Object propertyKey : properties.keySet()) {
+                    Map<String, JRParameter> reportParameters = new HashMap<String, JRParameter>();
+
+                    for (JRParameter param : jasperReport.getParameters()) {
+                        reportParameters.put(param.getName(), param);
+                    }
+
+                    for (Object propertyKey : properties.keySet()) {
                         String parameterName = String.valueOf(propertyKey);
                         String parameterValue = String.valueOf(properties.get(propertyKey));
-                        System.out.println("Setting property " + parameterName + " " + parameterValue);
+                        JRParameter reportParam = reportParameters.get(parameterName);
 
-                        parameters.put(parameterName,parameterValue);
+                        if (reportParam != null) {
+                            if (reportParam.getValueClass().equals(String.class)) {
+                                System.out.println("Property " + parameterName + " set to String = " + parameterValue);
+                                parameters.put(parameterName, parameterValue);
+                            } else if (reportParam.getValueClass().equals(Integer.class)) {
+                                System.out.println("Property " + parameterName + " set to Integer = " + parameterValue);
+                                parameters.put(parameterName, Integer.parseInt(parameterValue));
+                            } else {
+                                throw new RuntimeException("Unsupported type for property "+parameterName);
+                            }
+                        } else {
+                            System.out.println("Property " + parameterName + " not found in the report! IGNORING");
+
+                        }
                     }
 
                     JasperPrint print = JasperFillManager.fillReport(jasperReport, parameters, connection);
