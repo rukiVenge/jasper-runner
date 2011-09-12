@@ -109,7 +109,9 @@ public class JasperRunner {
                                 System.out.println("Property " + parameterName + " set to Integer = " + parameterValue);
                                 parameters.put(parameterName, Integer.parseInt(parameterValue));
                             } else {
-                                throw new RuntimeException("Unsupported type for property "+parameterName);
+                                System.err.print("Unsupported type for property "+parameterName);
+                                System.exit(1);
+
                             }
                         } else {
                             System.out.println("Property " + parameterName + " not found in the report! IGNORING");
